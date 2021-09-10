@@ -7,12 +7,12 @@ on:
 env:
   ANSIBLE_REPO: epimorphics/notfound
   ANSIBLE_REPO_REF: main
-  ANSIBLE_VAULT_PASSWORD: "${{ secrets.EXPT_ANSIBLE_VAULT_PASSWORD }}"
-  AWS_ACCESS_KEY_ID: "${{ secrets.BUILD_EXPT_AWS_ACCESS_KEY_ID }}"
-  AWS_SECRET_ACCESS_KEY: "${{ secrets.BUILD_EXPT_AWS_SECRET_ACCESS_KEY }}"
+  ANSIBLE_VAULT_PASSWORD: "${{ secrets.HMLR_ANSIBLE_VAULT_PASSWORD }}"
+  AWS_ACCESS_KEY_ID: "${{ secrets.BUILD_HMLR_AWS_ACCESS_KEY_ID }}"
+  AWS_SECRET_ACCESS_KEY: "${{ secrets.BUILD_HMLR_AWS_SECRET_ACCESS_KEY }}"
   AWS_REGION: "eu-west-1"
-  HOST_PREFIX: "expt"
-  SSH_KEY: "${{ secrets.EXPT_SSH_KEY }}"
+  HOST_PREFIX: "hmlr"
+  SSH_KEY: "${{ secrets.HMLR_SSH_KEY }}"
 
 #---- Below this line should not require editing ----
 jobs:
