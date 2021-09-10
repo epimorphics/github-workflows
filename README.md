@@ -10,7 +10,7 @@ git-subrepo. See https://github.com/ingydotnet/git-subrepo#installation-instruct
 
 To copy this subrepo into an application's repository:
 ```
-git subrepo clone git@github.com:epimorphics/github-workflows.git .github/workflows -b nrw
+git subrepo clone git@github.com:epimorphics/github-workflows.git .github/workflows -b hmlr
 ```
 
 To update this subrepo in an application's repository:
