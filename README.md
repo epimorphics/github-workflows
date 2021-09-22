@@ -5,7 +5,7 @@ This repository is intended to hold common github workflow scripts.
 Each customer installation has its own branch.
 
 The workflow should be installed into a applications repository using
-git-subrepo. See https://github.com/ingydotnet/git-subrepo.
+git-subrepo. See https://github.com/ingydotnet/git-subrepo#installation-instructions.
 
 
 To copy this subrepo into an applicaiton's repository:

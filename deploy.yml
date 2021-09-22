@@ -109,7 +109,7 @@ jobs:
       with:
         secret: "${{ env.ANSIBLE_VAULT_PASSWORD }}"
         stage: "${{ needs.publish.outputs.deploy }}"
-        name: "${{ needs.publish.outpurs.key }}"
+        name: "${{ needs.publish.outputs.key }}"
         version: "${{ needs.publish.outputs.tag }}"
 
     - name: "Git Commit"
@@ -120,7 +120,7 @@ jobs:
         then
           git config --global user.name "Github CICD"
           git config --global user.email "noreply@epimorphics.com"
-          git commit -am "Github/CICD: ${{ needs.publish.outpurs.key }}:${{ needs.publish.outputs.tag }}"
+          git commit -am "Github/CICD: ${{ needs.publish.outputs.key }}:${{ needs.publish.outputs.tag }}"
           git push
         else
           echo "No changes to commit"
