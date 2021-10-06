@@ -8,7 +8,7 @@ The workflow should be installed into a applications repository using
 git-subrepo. See https://github.com/ingydotnet/git-subrepo#installation-instructions.
 
 
-To copy this subrepo into an applicaiton's repository:
+To copy this subrepo into an application's repository:
 ```
 git subrepo clone git@github.com:epimorphics/github-workflows.git .github/workflows -b <branch>
 ```
