@@ -13,7 +13,7 @@ To copy this subrepo into an application's repository:
 git subrepo clone git@github.com:epimorphics/github-workflows.git .github/workflows -b <branch>
 ```
 
-To update this subrepo in an applicaiton's repository:
+To update this subrepo in an application's repository:
 ```
 git subrepo pull .github/workflows
 ```
