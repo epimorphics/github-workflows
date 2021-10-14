@@ -7,12 +7,12 @@ on:
 env:
   ANSIBLE_REPO: epimorphics/notfound
   ANSIBLE_REPO_REF: main
-  ANSIBLE_VAULT_PASSWORD: "${{ secrets.EXPT_ANSIBLE_VAULT_PASSWORD }}"
-  AWS_ACCESS_KEY_ID: "${{ secrets.BUILD_EXPT_AWS_ACCESS_KEY_ID }}"
-  AWS_SECRET_ACCESS_KEY: "${{ secrets.BUILD_EXPT_AWS_SECRET_ACCESS_KEY }}"
+  ANSIBLE_VAULT_PASSWORD: "not set"
+  AWS_ACCESS_KEY_ID: "not set"
+  AWS_SECRET_ACCESS_KEY: "not set"
   AWS_REGION: "eu-west-1"
   HOST_PREFIX: "expt"
-  SSH_KEY: "${{ secrets.EXPT_SSH_KEY }}"
+  SSH_KEY: "not set"
 
 #---- Below this line should not require editing ----
 jobs:
@@ -74,7 +74,9 @@ jobs:
       run: |
         PAT=${{ secrets.EPI_GPR_ACCESS_TOKEN }} make publish
 
-
+  # N.B. This job will not be triggered if there is no "deploy" target specified in deployment.yaml.
+  # This allows the workflow file to be used for just the publishing step e.g. in
+  # cases such as EKS where the deployment is automated via flux and Ansible is not used
   deploy:
     needs: publish
     name: "Deploy: Ansible"

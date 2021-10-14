@@ -2,7 +2,7 @@
 
 This repository is intended to hold common github workflow scripts.
 
-Each customer installation has its own branch.
+Each customer installation has its own branch. There is also a branch `expt` for publishing to our own ECR registry.
 
 The workflow should be installed into a applications repository using
 git-subrepo. See https://github.com/ingydotnet/git-subrepo#installation-instructions.
