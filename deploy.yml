@@ -7,8 +7,8 @@ on:
 env:
   ANSIBLE_REPO: epimorphics/notfound
   ANSIBLE_REPO_REF: main
-  ANSIBLE_VAULT_PASSWORD: "not set"
-  AWS_ACCESS_KEY_ID: "not set"
+  AWS_ACCESS_KEY_ID: "${{ secrets.BUILD_EXPT_AWS_ACCESS_KEY_ID }}"
+  AWS_SECRET_ACCESS_KEY: "${{ secrets.BUILD_EXPT_AWS_SECRET_ACCESS_KEY }}"
   AWS_SECRET_ACCESS_KEY: "not set"
   AWS_REGION: "eu-west-1"
   HOST_PREFIX: "expt"
