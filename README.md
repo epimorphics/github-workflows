@@ -2,7 +2,7 @@
 
 This repository is intended to hold common github workflow scripts.
 
-Each customer installation has its own branch. There is also a branch `expt` for publishing to our own ECR registry.
+Each customer installation has its own branch.
 
 The workflow should be installed into a applications repository using
 git-subrepo. See https://github.com/ingydotnet/git-subrepo#installation-instructions.
@@ -10,7 +10,7 @@ git-subrepo. See https://github.com/ingydotnet/git-subrepo#installation-instruct
 
 To copy this subrepo into an application's repository:
 ```
-git subrepo clone git@github.com:epimorphics/github-workflows.git .github/workflows -b <branch>
+git subrepo clone git@github.com:epimorphics/github-workflows.git .github/workflows -b ea
 ```
 
 To update this subrepo in an application's repository:
