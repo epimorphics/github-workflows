@@ -107,7 +107,7 @@ jobs:
 
     - name: "Ansible Deploy"
       if: ( needs.publish.outputs.tag != '' && needs.publish.outputs.deploy != '' )
-      uses: epimorphics/github-actions/ansible-deploy-image@v6
+      uses: epimorphics/github-actions/ansible-deploy-image@v7
       with:
         secret: "${{ env.ANSIBLE_VAULT_PASSWORD }}"
         stage: "${{ needs.publish.outputs.deploy }}"
