@@ -12,6 +12,7 @@ env:
   AWS_SECRET_ACCESS_KEY: "not set"
   AWS_REGION: "eu-west-1"
   HOST_PREFIX: "expt"
+  NODE_VERSION: ""
   SSH_KEY: "not set"
 
 #---- Below this line should not require editing ----
@@ -27,6 +28,12 @@ jobs:
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
+
+    - name: "Setup Node.js environment"
+      if:  != ''
+      uses: actions/setup-node@v1.4.4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
 
     - name: "Check for mapped deployment"
       id: mapper
