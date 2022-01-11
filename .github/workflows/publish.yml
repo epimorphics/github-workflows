@@ -1,4 +1,4 @@
-name: Publish Docker Image to ECR
+name: "Publish Docker Image"
 on:
   workflow_call:
     inputs:
@@ -6,13 +6,13 @@ on:
         description: "AWS region of ECR"
         required: false
         default: "eu-west-1"
-      image:
+      image:   # Output from build stage
         description: "Docker Image Name"
         required: true
-      publish:
+      publish: # Output from build stage
         description: "ECR Subdirectory"
         required: true
-      tag:
+      tag:     # Output from build stage
         description: "Docker image Tag"
         required: true
     secrets:
@@ -25,7 +25,7 @@ on:
 
 jobs:
   publish:
-    name: "Publish Docker Image"
+    name: "Upload Docker Image to ECR"
     runs-on: ubuntu-20.04
     if: ( inputs.image != '' && inputs.publish != '' && inputs.tag != '' )
     steps:
@@ -40,7 +40,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: "Create ECR"
+    - name: "Create ECR area"
       uses: epimorphics/github-actions/create-ecr-action@v6
       with:
         image: ${{ inputs.image }}/${{ inputs.publish }}

@@ -13,22 +13,16 @@ on:
         required: false
         type: string
         default: "main"
-      deploy:
+      deploy: # Output from build stage
         required: true
         type: string
-      host_prefix:
+      host_prefix: # used by ssh config
         required: true
         type: string
-      key:
+      key: # Output from build stage
         required: true
         type: string
-      git_pat:
-        required: true
-        type: string
-      tag:
-        required: true
-        type: string
-      ssh_key:
+      tag: # Output from build stage
         required: true
         type: string
     secrets:
@@ -38,12 +32,14 @@ on:
         required: true
       git_repository_full_access_pat:
         required: true
+      ssh_key:
+        required: true
       vault_password:
         required: true
 
 jobs:
   deploy:
-    name: "Deploy: Ansible"
+    name: "Deploy via Ansible"
     runs-on: ubuntu-20.04
     if: inputs.deploy != ''
     steps:
