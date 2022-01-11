@@ -1,0 +1,54 @@
+name: Publish Docker Image to ECR
+on:
+  workflow_call:
+    inputs:
+      aws_region:
+        description: "AWS region of ECR"
+        required: false
+        default: "eu-west-1"
+      image:
+        description: "Docker Image Name"
+        required: true
+      publish:
+        description: "ECR Subdirectory"
+        required: true
+      tag:
+        description: "Docker image Tag"
+        required: true
+    secrets:
+      aws_access_key_id:
+        required: true
+      aws_secret_access_key:
+        required: true
+      epi_gpr_access_token:
+        required: true
+
+jobs:
+  publish:
+    name: "Publish Docker Image"
+    runs-on: ubuntu-20.04
+    if: ( inputs.image != '' && inputs.publish != '' && inputs.tag != '' )
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: "${{ secret.aws_access_key_id }}"
+        aws-secret-access-key: "${{ secret.aws_secret_access_key }}"
+        aws-region: "${{ inputs.aws_region }}"
+
+    - name: "Login to Amazon ECR"
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: "Create ECR"
+      uses: epimorphics/github-actions/create-ecr-action@v6
+      with:
+        image: ${{ inputs.image }}/${{ inputs.publish }}
+
+    - name: "Publish image"
+      env:
+        IMAGE: ${{ inputs.image }}/${{ inputs.publish }}
+        TAG: ${{ inputs.tag }}
+      shell: bash
+      run: |
+        PAT=${{ secrets.epi_gpr_access_token }} make publish

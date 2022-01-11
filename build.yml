@@ -1,0 +1,55 @@
+name: Docker Image Build
+on:
+  workflow_call:
+    outputs:
+      deploy:
+        description: "The deployment environment"
+        value: ${{ jobs.build.outputs.deploy }}
+      image:
+        description: "The name of the docker image"
+        value: ${{ jobs.build.outputs.image }}
+      key:
+        description: "The Ansible to use in deployment"
+        value: ${{ jobs.build.outputs.key }}
+      publish:
+        description: "The ECR location"
+        value: ${{ jobs.build.outputs.publish }}
+      tag:
+        description: "The tag of the built docker image"
+        value: ${{ steps.gittag.outputs.tag }}
+    secrets:
+      epi_gpr_access_token:
+        required: false
+
+jobs:
+  build:
+    name: "Create Docker Image"
+    runs-on: ubuntu-20.04
+    outputs:
+      deploy: ${{ steps.mapper.outputs.deploy }}
+      image: ${{ steps.mapper.outputs.image }}
+      key: ${{ steps.mapper.outputs.key }}
+      publish: ${{ steps.mapper.outputs.publish }}
+      tag: ${{ steps.gittag.outputs.tag }}
+
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v2
+
+    - name: "Check for mapped deployment"
+      id: mapper
+      uses: epimorphics/github-actions/mapper@v6
+      with:
+        ref: "${{github.ref}}"
+
+    - name: "Get image tag"
+      id: gittag
+      uses: epimorphics/github-actions/generate-tag@v6
+
+    - name: "Create image"
+      if: steps.mapper.outputs.image != ''
+      env:
+        REPO: ${{ steps.mapper.outputs.image }}
+      shell: bash
+      run: |
+        PAT=${{ secrets.epi_gpr_access_token }} make image

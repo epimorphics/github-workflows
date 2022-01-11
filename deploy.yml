@@ -1,136 +1,94 @@
-# See github-workflows for the latest version of this file.
-
-name: Ansible Deployment
+name: Deployment via Ansible
 on:
-  workflow_dispatch: {}
-  push: {}
-env:
-  ANSIBLE_REPO: epimorphics/notfound
-  ANSIBLE_REPO_REF: main
-  ANSIBLE_VAULT_PASSWORD: "not set"
-  AWS_ACCESS_KEY_ID: "not set"
-  AWS_SECRET_ACCESS_KEY: "not set"
-  AWS_REGION: "eu-west-1"
-  HOST_PREFIX: "expt"
-  SSH_KEY: "not set"
+  workflow_call: {}
+    inputs:
+      aws_region:
+        required: false
+        type: string
+        default: "eu-west-1"
+      ansible_repo:
+        required: true
+        type: string
+      ansible_repo_ref:
+        required: false
+        type: string
+        default: "main"
+      deploy:
+        required: true
+        type: string
+      host_prefix:
+        required: true
+        type: string
+      key:
+        required: true
+        type: string
+      git_pat:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+      ssh_key:
+        required: true
+        type: string
+    secrets:
+      aws_access_key_id:
+        required: true
+      aws_secret_access_key:
+        required: true
+      git_repository_full_access_pat:
+        required: true
+      vault_password:
+        required: true
 
-#---- Below this line should not require editing ----
 jobs:
-  publish:
-    name: "Publish: ECR Image Upload"
-    runs-on: ubuntu-20.04
-    outputs:
-      deploy: ${{ steps.mapper.outputs.deploy }}
-      key: ${{ steps.mapper.outputs.key }}
-      tag: ${{ steps.gittag.outputs.tag }}
-
-    steps:
-    - name: "Checkout"
-      uses: actions/checkout@v2
-
-    - name: "Setup Node.js environment"
-      if:  hashFiles('.nvmrc') != ''
-      uses: actions/setup-node@v2
-      with:
-        node-version-file: '.nvmrc'
-
-    - name: "Check for mapped deployment"
-      id: mapper
-      uses: epimorphics/github-actions/mapper@v6
-      with:
-        ref: "${{github.ref}}"
-
-    - name: "Get image tag"
-      id: gittag
-      uses: epimorphics/github-actions/generate-tag@v6
-
-    - name: "Create image"
-      if: steps.mapper.outputs.image != ''
-      env:
-        REPO: ${{ steps.mapper.outputs.image }}
-      shell: bash
-      run: |
-        PAT=${{ secrets.EPI_GPR_ACCESS_TOKEN }} make image
-
-    - name: Configure AWS Credentials
-      if: steps.mapper.outputs.publish != ''
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        aws-region: "${{ env.AWS_REGION }}"
-
-    - name: "Login to Amazon ECR"
-      if: steps.mapper.outputs.publish != ''
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: "Create ECR"
-      if: steps.mapper.outputs.publish != ''
-      uses: epimorphics/github-actions/create-ecr-action@v6
-      with:
-        image: ${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}
-
-    - name: "Publish image"
-      if: ( steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
-      env:
-        IMAGE: ${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}
-        TAG: ${{ steps.gittag.outputs.tag }}
-      shell: bash
-      run: |
-        PAT=${{ secrets.EPI_GPR_ACCESS_TOKEN }} make publish
-
-  # N.B. This job will not be triggered if there is no "deploy" target specified in deployment.yaml.
-  # This allows the workflow file to be used for just the publishing step e.g. in
-  # cases such as EKS where the deployment is automated via flux and Ansible is not used
   deploy:
-    needs: publish
     name: "Deploy: Ansible"
     runs-on: ubuntu-20.04
-    if: needs.publish.outputs.deploy != ''
+    if: inputs.deploy != ''
     steps:
     - name: "SSH Setup: github -> aws"
       uses: shimataro/ssh-key-action@v2
       with:
-        key: "${{ env.SSH_KEY }}"
+        key: "${{ inputs.ssh_key }}"
         known_hosts: unnesessary
 
     - name: "Install Ansible"
       uses: epimorphics/github-actions/ansible@v7
       with:
-        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        aws-region: "${{ env.AWS_REGION }}"
-        host-prefix: "${{ env.HOST_PREFIX}}"
+        aws-access-key-id: "${{ secrets.aws_access_key_id }}"
+        aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
+        aws-region: "${{ inputs.aws_region }}"
+        host-prefix: "${{ inputs.host_prefix }}"
 
     - name: "Ansible Deployment Repository Checkout"
       id: deploy
       uses: actions/checkout@v2
       with:
-        repository: "${{ env.ANSIBLE_REPO }}"
-        ref: "${{ env.ANSIBLE_REPO_REF }}"
-        token: "${{ secrets.GIT_REPOSITORY_FULL_ACCESS_PAT }}"
+        repository: "${{ inputs.ansible_repo }}"
+        ref: "${{ inputs.ansible_repo_ref }}"
+        token: "${{ secrets.git_repository_full_access_pat }}"
 
     - name: "Ansible Deploy"
-      if: ( needs.publish.outputs.tag != '' && needs.publish.outputs.deploy != '' )
+      if: ( inputs.tag != '' && inputs.deploy != '' )
       uses: epimorphics/github-actions/ansible-deploy-image@v7
       with:
-        secret: "${{ env.ANSIBLE_VAULT_PASSWORD }}"
-        stage: "${{ needs.publish.outputs.deploy }}"
-        name: "${{ needs.publish.outputs.key }}"
-        version: "${{ needs.publish.outputs.tag }}"
+        secret: "${{ secrets.ansible_vault_password }}"
+        stage: "${{ inputs.deploy }}"
+        name: "${{ inputs.key }}"
+        version: "${{ inputs.tag }}"
 
     - name: "Git Commit"
-      if: needs.publish.outputs.tag != ''
+      if: inputs.tag != ''
       shell: bash
       run: |
         if ! git diff --quiet
         then
           git config --global user.name "Github CICD"
           git config --global user.email "noreply@epimorphics.com"
-          git commit -am "Github/CICD: ${{ needs.publish.outputs.deploy }}/${{ needs.publish.outputs.key }}:${{ needs.publish.outputs.tag }}"
+          git commit -am "Github/CICD: ${{ inputs.deploy }}/${{ inputs.key }}:${{ inputs.tag }}"
           git push
         else
           echo "No changes to commit"
-          echo "tag: ${{ needs.publish.outputs.tag }}"
+          echo "tag: ${{ inputs.tag }}"
         fi
