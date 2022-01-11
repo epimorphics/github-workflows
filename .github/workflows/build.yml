@@ -16,7 +16,7 @@ on:
         value: ${{ jobs.build.outputs.publish }}
       tag:
         description: "The tag of the built docker image"
-        value: ${{ steps.gittag.outputs.tag }}
+        value: ${{ jobs.build.outputs.tag }}
     secrets:
       epi_gpr_access_token:
         required: false
