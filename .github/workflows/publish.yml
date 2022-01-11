@@ -33,26 +33,26 @@ jobs:
     runs-on: ubuntu-20.04
     if: ( inputs.image != '' && inputs.publish != '' && inputs.tag != '' )
     steps:
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: "Configure AWS Credentials"
+      uses: "aws-actions/configure-aws-credentials@v1"
       with:
-        aws_access_key_id: "${{ secret.aws_access_key_id }}"
-        aws_secret_access_key: "${{ secret.aws_secret_access_key }}"
+        aws_access_key_id: "${{ secrets.aws_access_key_id }}"
+        aws_secret_access_key: "${{ secrets.aws_secret_access_key }}"
         aws_region: "${{ inputs.aws_region }}"
 
     - name: "Login to Amazon ECR"
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      id: "login-ecr"
+      uses: "aws-actions/amazon-ecr-login@v1"
 
     - name: "Create ECR area"
-      uses: epimorphics/github-actions/create-ecr-action@v6
+      uses: "epimorphics/github-actions/create-ecr-action@v6"
       with:
-        image: ${{ inputs.image }}/${{ inputs.publish }}
+        image: "${{ inputs.image }}/${{ inputs.publish }}"
 
     - name: "Publish image"
       env:
-        IMAGE: ${{ inputs.image }}/${{ inputs.publish }}
-        TAG: ${{ inputs.tag }}
+        IMAGE: "${{ inputs.image }}/${{ inputs.publish }}"
+        TAG: "${{ inputs.tag }}"
       shell: bash
       run: |
         PAT=${{ secrets.epi_gpr_access_token }} make publish
