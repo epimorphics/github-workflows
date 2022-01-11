@@ -3,18 +3,22 @@ on:
   workflow_call:
     inputs:
       aws_region:
+        default: "eu-west-1"
         description: "AWS region of ECR"
         required: false
-        default: "eu-west-1"
+        type: string
       image:   # Output from build stage
         description: "Docker Image Name"
         required: true
+        type: string
       publish: # Output from build stage
         description: "ECR Subdirectory"
         required: true
+        type: string
       tag:     # Output from build stage
         description: "Docker image Tag"
         required: true
+        type: string
     secrets:
       aws_access_key_id:
         required: true
