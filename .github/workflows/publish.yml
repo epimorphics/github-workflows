@@ -1,24 +1,6 @@
-name: "Publish Docker Image"
+name: "Bulid & Publish Docker Image"
 on:
   workflow_call:
-    inputs:
-      aws_region:
-        default: "eu-west-1"
-        description: "AWS region of ECR"
-        required: false
-        type: string
-      image:   # Output from build stage
-        description: "Docker Image Name"
-        required: true
-        type: string
-      publish: # Output from build stage
-        description: "ECR Subdirectory"
-        required: true
-        type: string
-      tag:     # Output from build stage
-        description: "Docker image Tag"
-        required: true
-        type: string
     secrets:
       aws_access_key_id:
         required: true
@@ -26,14 +8,51 @@ on:
         required: true
       epi_gpr_access_token:
         required: true
+    outputs:
+      deploy:
+        description: "The deployment environment"
+        value: ${{ jobs.build.outputs.deploy }}
+      key:
+        description: "The Ansible to use in deployment"
+        value: ${{ jobs.build.outputs.key }}
+      tag:
+        description: "The tag of the built docker image"
+        value: ${{ jobs.build.outputs.tag }}
 
 jobs:
   publish:
-    name: "Upload Docker Image to ECR"
+    name: "Build & Upload Docker Image to ECR"
     runs-on: ubuntu-20.04
-    if: ( inputs.image != '' && inputs.publish != '' && inputs.tag != '' )
+    outputs:
+      deploy: ${{ steps.mapper.outputs.deploy }}
+      key: ${{ steps.mapper.outputs.key }}
+      publish: ${{ steps.mapper.outputs.publish }}
+      tag: ${{ steps.gittag.outputs.tag }}
+
     steps:
+    - name: "Checkout"
+      uses: actions/checkout@v2
+
+    - name: "Check for mapped deployment"
+      id: mapper
+      uses: epimorphics/github-actions/mapper@v6
+      with:
+        ref: "${{github.ref}}"
+
+    - name: "Get image tag"
+      id: gittag
+      uses: epimorphics/github-actions/generate-tag@v6
+
+    - name: "Create image"
+      if: steps.mapper.outputs.image != ''
+      env:
+        REPO: ${{ steps.mapper.outputs.image }}
+      shell: bash
+      run: |
+        PAT=${{ secrets.epi_gpr_access_token }} make image
+
     - name: "Configure AWS Credentials"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
       uses: "aws-actions/configure-aws-credentials@v1"
       with:
         aws-access-key-id: "${{ secrets.aws_access_key_id }}"
@@ -41,18 +60,21 @@ jobs:
         aws-region: "${{ inputs.aws_region }}"
 
     - name: "Login to Amazon ECR"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
       id: "login-ecr"
       uses: "aws-actions/amazon-ecr-login@v1"
 
     - name: "Create ECR area"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
       uses: "epimorphics/github-actions/create-ecr-action@v6"
       with:
-        image: "${{ inputs.image }}/${{ inputs.publish }}"
+        image: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
 
     - name: "Publish image"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
       env:
-        IMAGE: "${{ inputs.image }}/${{ inputs.publish }}"
-        TAG: "${{ inputs.tag }}"
+        IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
+        TAG: "${{ steps.mapper.outputs.tag }}"
       shell: bash
       run: |
         PAT=${{ secrets.epi_gpr_access_token }} make publish
