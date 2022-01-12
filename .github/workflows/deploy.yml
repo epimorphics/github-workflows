@@ -1,6 +1,6 @@
-name: Deployment via Ansible
+name: "Deployment via Ansible"
 on:
-  workflow_call: {}
+  workflow_call:
     inputs:
       aws_region:
         required: false
