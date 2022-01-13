@@ -1,6 +1,11 @@
 name: "Bulid & Publish Docker Image"
 on:
   workflow_call:
+    inputs:
+      aws_region:
+        description: "AWS Region"
+        required: false
+        default: "eu-west-1"
     secrets:
       aws_access_key_id:
         required: true
@@ -42,12 +47,6 @@ jobs:
     - name: "Get image tag"
       id: gittag
       uses: epimorphics/github-actions/generate-tag@v6
-
-    - name: "Debug"
-      shell: bash
-      run: |
-        echo IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
-        echo TAG: "${{ steps.gittag.outputs.tag }}"
 
     - name: "Create image"
       if: steps.mapper.outputs.image != ''
