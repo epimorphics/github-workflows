@@ -17,13 +17,13 @@ on:
     outputs:
       deploy:
         description: "The deployment environment"
-        value: ${{ jobs.build.outputs.deploy }}
+        value: ${{ jobs.publish.outputs.deploy }}
       key:
         description: "The Ansible to use in deployment"
-        value: ${{ jobs.build.outputs.key }}
+        value: ${{ jobs.publish.outputs.key }}
       tag:
         description: "The tag of the built docker image"
-        value: ${{ jobs.build.outputs.tag }}
+        value: ${{ jobs.publish.outputs.tag }}
 
 jobs:
   publish:
