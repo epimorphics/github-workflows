@@ -43,6 +43,12 @@ jobs:
       id: gittag
       uses: epimorphics/github-actions/generate-tag@v6
 
+    - name: "Debug"
+      shell: bash
+      run: |
+        echo IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
+        echo TAG: "${{ steps.mapper.gittag.tag }}"
+
     - name: "Create image"
       if: steps.mapper.outputs.image != ''
       env:
