@@ -33,7 +33,7 @@ jobs:
     - name: "Checkout"
       uses: actions/checkout@v2
 
-    - name: "Check for mapped deployment"
+    - name: "Mapped deployment"
       id: mapper
       uses: epimorphics/github-actions/mapper@v6
       with:
@@ -52,7 +52,7 @@ jobs:
         PAT=${{ secrets.epi_gpr_access_token }} make image
 
     - name: "Configure AWS Credentials"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
       uses: "aws-actions/configure-aws-credentials@v1"
       with:
         aws-access-key-id: "${{ secrets.aws_access_key_id }}"
@@ -60,21 +60,21 @@ jobs:
         aws-region: "${{ inputs.aws_region }}"
 
     - name: "Login to Amazon ECR"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
       id: "login-ecr"
       uses: "aws-actions/amazon-ecr-login@v1"
 
     - name: "Create ECR area"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
       uses: "epimorphics/github-actions/create-ecr-action@v6"
       with:
         image: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
 
     - name: "Publish image"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.outputs.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
       env:
         IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
-        TAG: "${{ steps.mapper.outputs.tag }}"
+        TAG: "${{ steps.mapper.gittag.tag }}"
       shell: bash
       run: |
         PAT=${{ secrets.epi_gpr_access_token }} make publish
