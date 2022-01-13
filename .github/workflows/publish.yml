@@ -47,7 +47,7 @@ jobs:
       shell: bash
       run: |
         echo IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
-        echo TAG: "${{ steps.mapper.gittag.tag }}"
+        echo TAG: "${{ steps.gittag.outputs.tag }}"
 
     - name: "Create image"
       if: steps.mapper.outputs.image != ''
@@ -58,7 +58,7 @@ jobs:
         PAT=${{ secrets.epi_gpr_access_token }} make image
 
     - name: "Configure AWS Credentials"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
       uses: "aws-actions/configure-aws-credentials@v1"
       with:
         aws-access-key-id: "${{ secrets.aws_access_key_id }}"
@@ -66,21 +66,21 @@ jobs:
         aws-region: "${{ inputs.aws_region }}"
 
     - name: "Login to Amazon ECR"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
       id: "login-ecr"
       uses: "aws-actions/amazon-ecr-login@v1"
 
     - name: "Create ECR area"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
       uses: "epimorphics/github-actions/create-ecr-action@v6"
       with:
         image: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
 
     - name: "Publish image"
-      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.mapper.gittag.tag != '' )
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
       env:
         IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
-        TAG: "${{ steps.mapper.gittag.tag }}"
+        TAG: "${{ steps.gittag.outputs.tag }}"
       shell: bash
       run: |
         PAT=${{ secrets.epi_gpr_access_token }} make publish
