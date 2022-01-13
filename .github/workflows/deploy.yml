@@ -32,7 +32,7 @@ on:
         required: true
       aws_secret_access_key:
         required: true
-      github_ref:
+      github_pat:
         required: true
       ssh_key:
         required: true
@@ -63,7 +63,7 @@ jobs:
       with:
         repository: "${{ inputs.ansible_repo }}"
         ref: "${{ inputs.ansible_repo_ref }}"
-        token: "${{ secrets.github_ref }}"
+        token: "${{ secrets.github_pat }}"
 
     - name: "Ansible Deploy"
       if: ( inputs.tag != '' && inputs.deploy != '' )
