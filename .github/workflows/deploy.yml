@@ -46,7 +46,7 @@ jobs:
     - name: "SSH Setup: github -> aws"
       uses: shimataro/ssh-key-action@v2
       with:
-        key: "${{ inputs.ssh_key }}"
+        key: "${{ secrets.ssh_key }}"
         known_hosts: unnesessary
 
     - name: "Install Ansible"
