@@ -6,6 +6,7 @@ on:
         description: "AWS Region"
         required: false
         default: "eu-west-1"
+        type: string
     secrets:
       aws_access_key_id:
         required: true
