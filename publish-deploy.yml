@@ -1,0 +1,36 @@
+# See github-workflows for the latest version of this file.
+
+name: "Build & Publish Docker Image"
+on:
+  workflow_dispatch: {}
+  push: {}
+
+jobs:
+  publish:
+    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@reusable"
+    secrets:
+      # Repostory specific
+      aws_access_key_id:     "${{ secrets.BUILD_NRW_AWS_ACCESS_KEY_ID }}"
+      aws_secret_access_key: "${{ secrets.BUILD_NRW_AWS_SECRET_ACCESS_KEY }}"
+      # Fixed
+      epi_gpr_access_token:  "${{ secrets.EPI_GPR_ACCESS_TOKEN }}"
+  deploy: 
+    needs: "publish"
+    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@reusable"
+    with:
+      # Repostory specific
+      ansible_repo:     epimorphics/nrw-ansible-deployment
+      ansible_repo_ref: main
+      host_prefix:      nrw
+      # Fixed
+      deploy: "${{ needs.publish.outputs.deploy }}"
+      key:    "${{ needs.publish.outputs.key }}"
+      tag:    "${{ needs.publish.outputs.tag }}"
+    secrets:
+      # Repostory specific
+      ansible_vault_password: "${{ secrets.NRW_ANSIBLE_VAULT_PASSWORD }}"
+      aws_access_key_id:      "${{ secrets.BUILD_NRW_AWS_ACCESS_KEY_ID }}"
+      aws_secret_access_key:  "${{ secrets.BUILD_NRW_AWS_SECRET_ACCESS_KEY }}"
+      ssh_key:                "${{ secrets.NRW_SSH_KEY }}"
+      # Fixed
+      github_pat: "${{ secrets.GIT_REPOSITORY_FULL_ACCESS_PAT }}"
