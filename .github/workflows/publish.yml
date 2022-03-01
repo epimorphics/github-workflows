@@ -47,7 +47,7 @@ jobs:
 
     - name: "Setup ruby"
       if:  steps.ruby.outputs.version != ''
-      used: ruby/setup-ruby
+      used: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ steps.ruby.outputs.version }}
 
