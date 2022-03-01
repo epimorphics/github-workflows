@@ -43,7 +43,7 @@ jobs:
       id: ruby
       shell: bash
       run: |
-        [ -f .ruby-version ] && echo ::set-output version=$(cat .ruby-version) ||  echo ::set-output version=''
+        [ -f .ruby-version ] && echo ::set-output name=version::$(cat .ruby-version) ||  echo ::set-output name=version::
 
     - name: "Setup ruby"
       if:  steps.ruby.outputs.version != ''
