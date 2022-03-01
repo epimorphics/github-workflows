@@ -39,6 +39,18 @@ jobs:
     - name: "Checkout"
       uses: actions/checkout@v2
 
+    - name: "Record desired ruby version"
+      id: ruby
+      shell: bash
+      run: |
+        [ -f .ruby-version ] && echo ::set-output version=$(cat .ruby-version) ||  echo ::set-output version=''
+
+    - name: "Setup ruby"
+      if:  steps.ruby.outputs.version != ''
+      used: ruby/setup-ruby
+      with:
+        ruby-version: ${{ steps.ruby.outputs.version }}
+
     - name: "Mapped deployment"
       id: mapper
       uses: epimorphics/github-actions/mapper@v6
