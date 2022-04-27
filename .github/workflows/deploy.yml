@@ -6,6 +6,10 @@ on:
         required: false
         type: string
         default: "eu-west-1"
+      ansible_playbook:
+        required: false
+        type: string
+        default: "apps.yml"
       ansible_repo:
         required: true
         type: string

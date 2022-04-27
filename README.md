@@ -29,9 +29,10 @@ jobs:
     uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@reusable"
     with:
       # Repostory specific
-      ansible_repo:     epimorphics/xxxx-ansible-deployment
-      ansible_repo_ref: master/main
-      host_prefix:      xxxx
+      ansible_repo:     Required. epimorphics/xxxx-ansible-deployment
+      ansible_repo_ref: Default: "main"
+      ansible_playbook: Default: "apps.yml"
+      host_prefix:      Required. (hmlr/nrw etc)
       # Fixed
       deploy: "${{ needs.publish.outputs.deploy }}"
       key:    "${{ needs.publish.outputs.key }}"
