@@ -23,7 +23,7 @@ jobs:
       aws_access_key_id:     "${{ secrets.BUILD_XXXX_AWS_ACCESS_KEY_ID }}"
       aws_secret_access_key: "${{ secrets.BUILD_XXXX_AWS_SECRET_ACCESS_KEY }}"
       # Fixed
-      epi_gpr_access_token:  "${{ secrets.EPI_GPR_ACCESS_TOKEN }}"
+      epi_gpr_access_token:  "${{ secrets.EPI_GPR_READ_ACCESS_TOKEN }}"
   deploy: 
     needs: "publish"
     uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@reusable"

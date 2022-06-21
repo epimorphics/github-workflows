@@ -54,7 +54,7 @@ jobs:
         known_hosts: unnesessary
 
     - name: "Install Ansible"
-      uses: epimorphics/github-actions/ansible@v7
+      uses: epimorphics/github-actions/ansible@v9
       with:
         aws-access-key-id: "${{ secrets.aws_access_key_id }}"
         aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
@@ -71,12 +71,13 @@ jobs:
 
     - name: "Ansible Deploy"
       if: ( inputs.tag != '' && inputs.deploy != '' )
-      uses: epimorphics/github-actions/ansible-deploy-image@v7
+      uses: epimorphics/github-actions/ansible-deploy-image@v9
       with:
         secret: "${{ secrets.ansible_vault_password }}"
         stage: "${{ inputs.deploy }}"
         name: "${{ inputs.key }}"
         version: "${{ inputs.tag }}"
+        playbook: "${{ inputs.ansible_playbook }}"
 
     - name: "Git Commit"
       if: inputs.tag != ''
