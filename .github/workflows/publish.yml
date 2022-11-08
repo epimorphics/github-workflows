@@ -37,7 +37,7 @@ jobs:
 
     steps:
     - name: "Checkout"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: "Record desired ruby version"
       id: ruby
@@ -53,13 +53,13 @@ jobs:
 
     - name: "Mapped deployment"
       id: mapper
-      uses: epimorphics/github-actions/mapper@v6
+      uses: epimorphics/github-actions/mapper@v9
       with:
         ref: "${{github.ref}}"
 
     - name: "Get image tag"
       id: gittag
-      uses: epimorphics/github-actions/generate-tag@v6
+      uses: epimorphics/github-actions/generate-tag@v9
 
     - name: "Create image"
       if: steps.mapper.outputs.image != ''
@@ -71,7 +71,7 @@ jobs:
 
     - name: "Configure AWS Credentials"
       if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
-      uses: "aws-actions/configure-aws-credentials@v1"
+      uses: "aws-actions/configure-aws-credentials@v1-node16"
       with:
         aws-access-key-id: "${{ secrets.aws_access_key_id }}"
         aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
@@ -84,7 +84,7 @@ jobs:
 
     - name: "Create ECR area"
       if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
-      uses: "epimorphics/github-actions/create-ecr-action@v6"
+      uses: "epimorphics/github-actions/create-ecr-action@v9"
       with:
         image: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
 
