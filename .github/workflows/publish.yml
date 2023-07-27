@@ -53,11 +53,11 @@ jobs:
 
     - name: "Mapped deployment"
       id: mapper
-      uses: "epimorphics/github-actions/mapper@v13"
+      uses: "epimorphics/github-actions/mapper@v14"
 
     - name: "Get image tag"
       id: gittag
-      uses: "epimorphics/github-actions/generate-tag@v13"
+      uses: "epimorphics/github-actions/generate-tag@v14"
 
     - name: "Create image"
       if: steps.mapper.outputs.image != ''
@@ -82,7 +82,7 @@ jobs:
 
     - name: "Create ECR area"
       if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
-      uses: "epimorphics/github-actions/create-ecr-action@v13"
+      uses: "epimorphics/github-actions/create-ecr-action@v14"
       with:
         image: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
 
