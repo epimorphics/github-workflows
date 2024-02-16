@@ -63,7 +63,7 @@ jobs:
 
     - name: "Ansible Deployment Repository Checkout"
       id: deploy
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: "${{ inputs.ansible_repo }}"
         ref: "${{ inputs.ansible_repo_ref }}"
