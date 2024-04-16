@@ -7,6 +7,11 @@ on:
         required: false
         default: "eu-west-1"
         type: string
+      target:
+        description: "Target"
+        required: false
+        default: "image"
+        type: string
     secrets:
       aws_access_key_id:
         required: true
@@ -65,7 +70,7 @@ jobs:
         REPO: ${{ steps.mapper.outputs.image }}
       shell: bash
       run: |
-        PAT=${{ secrets.epi_gpr_access_token }} make image
+        PAT=${{ secrets.epi_gpr_access_token }} make ${{ inputs.target }}
 
     - name: "Configure AWS Credentials"
       if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
