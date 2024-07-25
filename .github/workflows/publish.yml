@@ -67,6 +67,9 @@ jobs:
     - name: "Create image"
       if: steps.mapper.outputs.image != ''
       env:
+        AWS_ACCESS_KEY_ID: "${{ secrets.aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "${{ secrets.aws_secret_access_key }}"
+        AWS_REGION: "${{ inputs.aws_region }}"
         REPO: ${{ steps.mapper.outputs.image }}
       shell: bash
       run: |
