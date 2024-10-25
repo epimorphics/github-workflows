@@ -33,7 +33,7 @@ on:
 jobs:
   publish:
     name: "Build & Upload Docker Image to ECR"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     outputs:
       deploy: ${{ steps.mapper.outputs.deploy }}
       key: ${{ steps.mapper.outputs.key }}
@@ -55,6 +55,12 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ steps.ruby.outputs.version }}
+
+    - name: "Setup Java"
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'corretto'
+        java-version: '21'
 
     - name: "Mapped deployment"
       id: mapper
