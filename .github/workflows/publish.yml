@@ -61,6 +61,7 @@ jobs:
       with:
         distribution: 'corretto'
         java-version: '21'
+        cache: 'maven'
 
     - name: "Mapped deployment"
       id: mapper
