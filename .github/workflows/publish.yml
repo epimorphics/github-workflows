@@ -1,0 +1,106 @@
+name: "Bulid & Publish Docker Image"
+on:
+  workflow_call:
+    inputs:
+      aws_region:
+        description: "AWS Region"
+        required: false
+        default: "eu-west-1"
+        type: string
+      target:
+        description: "Target"
+        required: false
+        default: "image"
+        type: string
+    secrets:
+      aws_access_key_id:
+        required: true
+      aws_secret_access_key:
+        required: true
+      epi_gpr_access_token:
+        required: false
+    outputs:
+      deploy:
+        description: "The deployment environment"
+        value: ${{ jobs.publish.outputs.deploy }}
+      key:
+        description: "The Ansible to use in deployment"
+        value: ${{ jobs.publish.outputs.key }}
+      tag:
+        description: "The tag of the built docker image"
+        value: ${{ jobs.publish.outputs.tag }}
+
+jobs:
+  publish:
+    name: "Build & Upload Docker Image to ECR"
+    runs-on: ubuntu-24.04
+    outputs:
+      deploy: ${{ steps.mapper.outputs.deploy }}
+      key: ${{ steps.mapper.outputs.key }}
+      publish: ${{ steps.mapper.outputs.publish }}
+      tag: ${{ steps.gittag.outputs.tag }}
+
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v4
+
+    - name: "Record desired ruby version"
+      id: ruby
+      shell: bash
+      run: |
+        [ -f .ruby-version ] && echo version=$(cat .ruby-version) | tee -a $GITHUB_OUTPUT ||  echo "version=" >> $GITHUB_OUTPUT
+
+    - name: "Setup ruby"
+      if:  steps.ruby.outputs.version != ''
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ steps.ruby.outputs.version }}
+
+    - name: "Mapped deployment"
+      id: mapper
+      uses: "epimorphics/github-actions/mapper@v18"
+
+    - name: "Get image tag"
+      id: gittag
+      uses: "epimorphics/github-actions/generate-tag@v18"
+
+    - name: "Create image"
+      if: steps.mapper.outputs.image != ''
+      env:
+        AWS_ACCESS_KEY_ID: "${{ secrets.aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "${{ secrets.aws_secret_access_key }}"
+        AWS_REGION: "${{ inputs.aws_region }}"
+        REPO: ${{ steps.mapper.outputs.image }}
+      shell: bash
+      run: |
+        PAT=${{ secrets.epi_gpr_access_token }} make ${{ inputs.target }}
+
+    - name: "Configure AWS Credentials"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
+      uses: "aws-actions/configure-aws-credentials@v4"
+      with:
+        aws-access-key-id: "${{ secrets.aws_access_key_id }}"
+        aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
+        aws-region: "${{ inputs.aws_region }}"
+
+    - name: "Login to Amazon ECR"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
+      id: "login-ecr"
+      uses: "aws-actions/amazon-ecr-login@v2"
+      with:
+        mask-password: 'true'
+          
+    - name: "Create ECR area"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
+      uses: "epimorphics/github-actions/create-ecr-action@v18"
+      with:
+        image: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
+
+    - name: "Publish image"
+      if: ( steps.mapper.outputs.image != '' && steps.mapper.outputs.publish != '' && steps.gittag.outputs.tag != '' )
+      env:
+        IMAGE: "${{ steps.mapper.outputs.image }}/${{ steps.mapper.outputs.publish }}"
+        TAG: "${{ steps.gittag.outputs.tag }}"
+      shell: bash
+      run: |
+        PAT=${{ secrets.epi_gpr_access_token }} make publish
