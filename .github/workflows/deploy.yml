@@ -44,7 +44,7 @@ on:
 jobs:
   deploy:
     name: "Deploy via Ansible"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     if: inputs.deploy != ''
     steps:
     - name: "SSH Setup: github -> aws"
