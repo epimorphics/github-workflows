@@ -17,7 +17,7 @@ on:
 
 jobs:
   publish:
-    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@reusable"
+    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@v2"
     secrets:
       # Repostory specific
       aws_access_key_id:     "${{ secrets.BUILD_XXXX_AWS_ACCESS_KEY_ID }}"
@@ -26,7 +26,7 @@ jobs:
       epi_gpr_access_token:  "${{ secrets.EPI_GPR_ACCESS_TOKEN }}"
   deploy: 
     needs: "publish"
-    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@reusable"
+    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@v2"
     with:
       # Repostory specific
       ansible_repo:     Required. epimorphics/xxxx-ansible-deployment
