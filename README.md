@@ -19,7 +19,7 @@ jobs:
   publish:
     uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@v2"
     secrets:
-      # Repostory specific
+      # Repository specific
       aws_access_key_id:     "${{ secrets.BUILD_XXXX_AWS_ACCESS_KEY_ID }}"
       aws_secret_access_key: "${{ secrets.BUILD_XXXX_AWS_SECRET_ACCESS_KEY }}"
       # Fixed
