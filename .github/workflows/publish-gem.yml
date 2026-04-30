@@ -3,7 +3,7 @@ name: Release and Publish Gem
 on:
   workflow_call:
     secrets:
-      github_token:
+      packages_token:
         description: GitHub token with packages:write permission
         required: true
 
@@ -40,7 +40,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.packages_token }}
         with:
           tag_name: ${{ steps.gitinfo.outputs.version }}
           name: v${{ steps.gitinfo.outputs.version }}
@@ -52,5 +52,5 @@ jobs:
 
       - name: Publish gem
         env:
-          PAT: ${{ secrets.github_token }}
+          PAT: ${{ secrets.packages_token }}
         run: make publish
