@@ -1,0 +1,56 @@
+name: Release and Publish Gem
+
+on:
+  workflow_call:
+    secrets:
+      github_token:
+        description: GitHub token with packages:write permission
+        required: true
+
+jobs:
+  build:
+    name: Build gem package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Record desired ruby version
+        id: ruby
+        shell: bash
+        run: |
+          [ -f .ruby-version ] && echo version=$(cat .ruby-version) | tee -a $GITHUB_OUTPUT || echo "version=" >> $GITHUB_OUTPUT
+
+      - name: Setup ruby
+        if: steps.ruby.outputs.version != ''
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ steps.ruby.outputs.version }}
+
+      - name: Git information
+        id: gitinfo
+        run: |
+          make tags | tee -a $GITHUB_OUTPUT
+
+      - name: Build gem
+        run: make gem
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: ${{ steps.gitinfo.outputs.version }}
+          name: v${{ steps.gitinfo.outputs.version }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.gitinfo.outputs.name }}-${{ steps.gitinfo.outputs.version }}.gem
+
+      - name: Publish gem
+        env:
+          PAT: ${{ secrets.github_token }}
+        run: make publish
