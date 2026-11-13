@@ -179,7 +179,7 @@ jobs:
     name: "Stop AWS Hosted Runner"
     runs-on: ubuntu-26.04
     needs: [HostedAction, StartHostedRunner]
-    if: (always() && needs.StartHostedRunner.outputs.spot-req-id != '')
+#   if: (always() && needs.StartHostedRunner.outputs.spot-req-id != '')
     steps:
       - name: "Cancel Spot Fleet Request"
         uses: epimorphics/github-actions/stop-hosted-runner@main
