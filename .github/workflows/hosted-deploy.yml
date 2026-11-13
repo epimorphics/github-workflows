@@ -79,6 +79,8 @@ jobs:
         shell: bash
         run: |
           echo "This is a self-hosted action running on an AWS EC2 instance started by the StartHostedRunner job."
+          pwd
+          ls -la
 
       - name: "AWS Credentials"
         id: AWSCredentials
