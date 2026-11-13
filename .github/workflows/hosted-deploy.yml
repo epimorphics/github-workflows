@@ -69,18 +69,24 @@ jobs:
           aws-runner:            "${{ inputs.aws_runner }}"
 
 
-  HostedAction:
-    name: "Hosted Action"
+  HostedDeploy:
+    name: "Hosted Deploy"
     runs-on: self-hosted
     needs: StartHostedRunner
     steps:
-      - name: "Self Hosted Action"
-        id: HostedAction
+      - name: "Self Deploy Action"
+        id: HostedDeploy
         shell: bash
         run: |
           echo "This is a self-hosted action running on an AWS EC2 instance started by the StartHostedRunner job."
           pwd
           ls -la
+
+     - name: "SSH Setup"
+       uses: shimataro/ssh-key-action@v2.8.1
+       with:
+         key: "${{ secrets.ssh_key }}"
+         known_hosts: unnesessary
 
       - name: "AWS Credentials"
         id: AWSCredentials
@@ -180,7 +186,7 @@ jobs:
   StopHostedRunner:
     name: "Stop AWS Hosted Runner"
     runs-on: ubuntu-26.04
-    needs: [HostedAction, StartHostedRunner]
+    needs: [HostedDeploy, StartHostedRunner]
 #   if: (always() && needs.StartHostedRunner.outputs.spot-req-id != '')
     steps:
       - name: "Cancel Spot Fleet Request"
