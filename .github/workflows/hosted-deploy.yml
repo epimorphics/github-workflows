@@ -82,11 +82,11 @@ jobs:
           pwd
           ls -la
 
-     - name: "SSH Setup"
-       uses: shimataro/ssh-key-action@v2.8.1
-       with:
-         key: "${{ secrets.ssh_key }}"
-         known_hosts: unnesessary
+      - name: "SSH Setup"
+        uses: shimataro/ssh-key-action@v2.8.1
+        with:
+          key: "${{ secrets.ssh_key }}"
+          known_hosts: unnesessary
 
       - name: "AWS Credentials"
         id: AWSCredentials
