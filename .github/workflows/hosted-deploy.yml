@@ -87,7 +87,6 @@ jobs:
           known_hosts: unnesessary
 
       - name: "Hosted Deploy Action"
-        id: HostedDeploy
         shell: bash
         run: |
           echo Home: $HOME
