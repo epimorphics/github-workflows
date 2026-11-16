@@ -86,13 +86,6 @@ jobs:
           key: "${{ secrets.ssh_key }}"
           known_hosts: unnesessary
 
-      - name: "Hosted Deploy Action"
-        shell: bash
-        run: |
-          echo Home: $HOME
-          ls -la $HOME/.ssh
-          ls -la /home/ec2-user/.ssh
-
       - name: "AWS Credentials"
         id: AWSCredentials
         uses: epimorphics/github-actions/aws-credentials@main
@@ -107,6 +100,13 @@ jobs:
           repository: "${{ inputs.ansible_repo }}"
           ref:        "${{ inputs.ansible_repo_ref }}"
           token:      "${{ secrets.github_pat }}"
+
+      - name: "Hosted Deploy Action"
+        shell: bash
+        run: |
+          echo Home: $HOME
+          ls -la $HOME/.ssh
+          ls -la /home/ec2-user/.ssh
 
       - name: "Ansible Deployment"
         if: ( inputs.tag != '' && inputs.deploy != '' && inputs.key != '' )
