@@ -74,19 +74,25 @@ jobs:
     runs-on: self-hosted
     needs: StartHostedRunner
     steps:
-      - name: "Self Deploy Action"
+      - name: "Hosted Deploy Action"
         id: HostedDeploy
         shell: bash
         run: |
           echo "This is a self-hosted action running on an AWS EC2 instance started by the StartHostedRunner job."
-          pwd
-          ls -la
 
       - name: "SSH Setup"
         uses: shimataro/ssh-key-action@v2.8.1
         with:
           key: "${{ secrets.ssh_key }}"
           known_hosts: unnesessary
+
+      - name: "Hosted Deploy Action"
+        id: HostedDeploy
+        shell: bash
+        run: |
+          echo Home: $HOME
+          ls -la $HOME/.ssh
+          ls -la /home/ec2-user/.ssh
 
       - name: "AWS Credentials"
         id: AWSCredentials
