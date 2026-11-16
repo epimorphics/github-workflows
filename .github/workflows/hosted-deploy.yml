@@ -101,13 +101,6 @@ jobs:
           ref:        "${{ inputs.ansible_repo_ref }}"
           token:      "${{ secrets.github_pat }}"
 
-      - name: "Hosted Deploy Action"
-        shell: bash
-        run: |
-          echo Home: $HOME
-          ls -la $HOME/.ssh
-          ls -la /home/ec2-user/.ssh
-
       - name: "Ansible Deployment"
         if: ( inputs.tag != '' && inputs.deploy != '' && inputs.key != '' )
         uses: epimorphics/github-actions/ansible-deploy-image@main
@@ -133,59 +126,6 @@ jobs:
             echo "No changes to commit"
             echo "tag: ${{ inputs.tag }}"
           fi
-
-
-# deploy:
-#   name: "Deploy via Ansible"
-#   runs-on: ubuntu-24.04
-#   if: inputs.deploy != ''
-#   steps:
-#   - name: "SSH Setup: github -> aws"
-#     uses: shimataro/ssh-key-action@v2.8.1
-#     with:
-#       key: "${{ secrets.ssh_key }}"
-#       known_hosts: unnesessary
-
-#   - name: "Setup Ansible"
-#     uses: "epimorphics/github-actions/ansible@v19"
-#     with:
-#       aws-access-key-id: "${{ secrets.aws_access_key_id }}"
-#       aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
-#       aws-region: "${{ inputs.aws_region }}"
-#       host-prefix: "${{ inputs.host_prefix }}"
-
-#   - name: "Ansible Deployment Repository Checkout"
-#     id: deploy
-#     uses: actions/checkout@v6
-#     with:
-#       repository: "${{ inputs.ansible_repo }}"
-#       ref: "${{ inputs.ansible_repo_ref }}"
-#       token: "${{ secrets.github_pat }}"
-
-#   - name: "Ansible Deploy"
-#     if: ( inputs.tag != '' && inputs.deploy != '' )
-#     uses: "epimorphics/github-actions/ansible-deploy-image@v19"
-#     with:
-#       secret: "${{ secrets.ansible_vault_password }}"
-#       stage: "${{ inputs.deploy }}"
-#       name: "${{ inputs.key }}"
-#       version: "${{ inputs.tag }}"
-#       playbook: "${{ inputs.ansible_playbook }}"
-
-#   - name: "Git Commit"
-#     if: inputs.tag != ''
-#     shell: bash
-#     run: |
-#       if ! git diff --quiet
-#       then
-#         git config --global user.name "Github CICD"
-#         git config --global user.email "noreply@epimorphics.com"
-#         git commit -am "Github/CICD: ${{ inputs.deploy }}/${{ inputs.key }}:${{ inputs.tag }}"
-#         git push
-#       else
-#         echo "No changes to commit"
-#         echo "tag: ${{ inputs.tag }}"
-#       fi
 
 
   StopHostedRunner:
