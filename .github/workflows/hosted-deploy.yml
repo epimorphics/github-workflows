@@ -5,11 +5,9 @@ on:
       aws_asg:
         required: false
         type: string
-        default: "hmlr-infra-runner"
       aws_runner:
         required: false
         type: string
-        default: "hmlr-github-runner"
       aws_region:
         required: false
         type: string
@@ -132,7 +130,7 @@ jobs:
     name: "Stop AWS Hosted Runner"
     runs-on: ubuntu-26.04
     needs: [HostedDeploy, StartHostedRunner]
-#   if: (always() && needs.StartHostedRunner.outputs.spot-req-id != '')
+    if: (always())
     steps:
       - name: "Cancel Spot Fleet Request"
         uses: epimorphics/github-actions/stop-hosted-runner@main
