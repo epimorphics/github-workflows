@@ -17,7 +17,7 @@ on:
 
 jobs:
   publish:
-    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@v22"
+    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@v2"
     secrets:
       # Repository specific
       aws_access_key_id:     "${{ secrets.BUILD_XXXX_AWS_ACCESS_KEY_ID }}"
@@ -30,7 +30,7 @@ AWS Hosted Runner
 ```
   deploy:
     name: "Deploy via AWS Hosted Runner"
-    uses:  "epimorphics/github-workflows/.github/workflows/hosted-deploy.yml@v22"
+    uses:  "epimorphics/github-workflows/.github/workflows/hosted-deploy.yml@v3"
     with:
       # Account/Repository specific
       ansible_playbook: Default: "apps.yml"
@@ -58,7 +58,7 @@ GitHub Hosted Runner DEPRICATED
 ```
   deploy: 
     needs: "publish"
-    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@v22"
+    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@v2"
     with:
       # Repostory specific
       ansible_repo:     Required. epimorphics/xxxx-ansible-deployment
