@@ -17,16 +17,48 @@ on:
 
 jobs:
   publish:
-    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@v2"
+    uses:  "epimorphics/github-workflows/.github/workflows/publish.yml@v22"
     secrets:
       # Repository specific
       aws_access_key_id:     "${{ secrets.BUILD_XXXX_AWS_ACCESS_KEY_ID }}"
       aws_secret_access_key: "${{ secrets.BUILD_XXXX_AWS_SECRET_ACCESS_KEY }}"
       # Fixed
       epi_gpr_access_token:  "${{ secrets.EPI_GPR_ACCESS_TOKEN }}"
+```
+
+AWS Hosted Runner
+```
+  deploy:
+    name: "Deploy via AWS Hosted Runner"
+    uses:  "epimorphics/github-workflows/.github/workflows/hosted-deploy.yml@v22"
+    with:
+      # Account/Repository specific
+      ansible_playbook: Default: "apps.yml"
+      ansible_repo:     "epimorphics/xxxx-ansible-deployment"
+      ansible_repo_ref: Default: "main"
+      aws_asg:          "xxxx-infra-runner"
+      aws_runner:       "xxxx-github-runner"
+      # Fixed
+      deploy:           "${{ needs.publish.outputs.deploy }}"
+      key:              "${{ needs.publish.outputs.key }}"
+      tag:              "${{ needs.publish.outputs.tag }}"
+    secrets:
+      # Account/Repository specific
+      ansible_vault_password: "${{ secrets.XXXX_ANSIBLE_VAULT_PASSWORD }}"
+      aws_access_key_id:      "${{ secrets.BUILD_XXXX_AWS_ACCESS_KEY_ID }}"
+      aws_secret_access_key:  "${{ secrets.BUILD_XXXX_AWS_SECRET_ACCESS_KEY }}"
+      ssh_key:                "${{ secrets.XXXX_SSH_KEY }}"
+      # Fixed
+      github_pat: "${{ secrets.GIT_REPOSITORY_FULL_ACCESS_PAT }}"
+```
+
+
+
+GitHub Hosted Runner DEPRICATED
+```
   deploy: 
     needs: "publish"
-    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@v2"
+    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@v22"
     with:
       # Repostory specific
       ansible_repo:     Required. epimorphics/xxxx-ansible-deployment
@@ -34,9 +66,7 @@ jobs:
       ansible_playbook: Default: "apps.yml"
       host_prefix:      Required. (hmlr/nrw etc)
       # Fixed
-      deploy: "${{ needs.publish.outputs.deploy }}"
-      key:    "${{ needs.publish.outputs.key }}"
-      tag:    "${{ needs.publish.outputs.tag }}"
+
     secrets:
       # Repostory specific
       ansible_vault_password: "${{ secrets.XXXX_ANSIBLE_VAULT_PASSWORD }}"
