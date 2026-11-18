@@ -58,7 +58,7 @@ jobs:
 
       - name: "Start AWS Hosted Runner"
         id: StartHostedRunner
-        uses: epimorphics/github-actions/start-hosted-runner@main
+        uses: epimorphics/github-actions/start-hosted-runner@v23
         with:
           aws-access-key-id:     "${{ secrets.aws_access_key_id }}"
           aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
@@ -68,7 +68,7 @@ jobs:
 
 
   HostedDeploy:
-    name: "Hosted Deploy"
+    name: "Hosted Ansible Deployment"
     runs-on: self-hosted
     needs: StartHostedRunner
     steps:
@@ -86,7 +86,7 @@ jobs:
 
       - name: "AWS Credentials"
         id: AWSCredentials
-        uses: epimorphics/github-actions/aws-credentials@main
+        uses: epimorphics/github-actions/aws-credentials@v23
         with:
           aws-access-key-id:     "${{ secrets.aws_access_key_id }}"
           aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
@@ -101,7 +101,7 @@ jobs:
 
       - name: "Ansible Deployment"
         if: ( inputs.tag != '' && inputs.deploy != '' && inputs.key != '' )
-        uses: epimorphics/github-actions/ansible-deploy-image@main
+        uses: epimorphics/github-actions/ansible-deploy-image@v23
         with:
           generate-hosts: "true"
           secret:         "${{ secrets.ansible_vault_password }}"
@@ -133,7 +133,7 @@ jobs:
     if: (always())
     steps:
       - name: "Cancel Spot Fleet Request"
-        uses: epimorphics/github-actions/stop-hosted-runner@main
+        uses: epimorphics/github-actions/stop-hosted-runner@v23
         with:
           aws-access-key-id:     "${{ secrets.aws_access_key_id }}"
           aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
