@@ -1,6 +1,6 @@
 name: QoS Proxy Update
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       aws_profile:
         required: false
