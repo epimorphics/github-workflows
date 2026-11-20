@@ -1,0 +1,60 @@
+name: QoS Proxy Update
+on:
+  workflow_dispatch:
+    inputs:
+      aws_profile:
+        required: false
+        type: string
+        default: "default"
+      aws_region:
+        required: false
+        type: string
+        default: "eu-west-1"
+      ansible_playbook:
+        required: false
+        type: string
+        default: "apps.yml"
+      host_prefix: # used by ssh config
+        required: true
+        type: string
+      environment:
+        required: false
+        type: string
+    secrets:
+      ansible_vault_password:
+        required: true
+      aws_access_key_id:
+        required: true
+      aws_secret_access_key:
+        required: true
+      ssh_key:
+        required: true
+jobs:
+  UpdateProxy:
+    name: "Update Proxy"
+    runs-on: ubuntu-26.04
+    steps:
+    - name: "SSH Setup: github -> aws"
+      uses: shimataro/ssh-key-action@v2.8.1
+      with:
+        key: "${{ secrets.ssh_key }}"
+        known_hosts: unnesessary
+    - name: "Ansible Setup"
+      uses: "epimorphics/github-actions/ansible@main"
+      with:
+        aws-access-key-id: "${{ secrets.aws_access_key_id }}"
+        aws-secret-access-key: "${{ secrets.aws_secret_access_key }}"
+        aws-profile: "${{ inputs.aws_profile }}"
+        host-prefix: "${{ inputs.host_prefix }}"
+    - name: "Ansible-Vault Password"
+      shell: bash
+      run: |
+        mkdir ansible/.secret && echo "${{ secrets.ansible_vault_password }}" > ansible/.secret/default
+    - name: "Ansible-Galaxy setup"
+      shell: bash
+      run: |
+        cd ansible && /bin/ansible-galaxy collection install -r requirements.yml
+    - name: "Ansible: Update Proxy"
+      shell: bash
+      run: |
+        cd ansible && /bin/ansible-playbook -l ${{ inputs.environment }} -t proxy --skip docker -CD ${{ inputs.ansible_playbook }}
